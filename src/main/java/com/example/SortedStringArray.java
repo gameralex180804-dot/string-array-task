@@ -1,33 +1,40 @@
 package com.example;
 
 public class SortedStringArray {
-    private String[] elements;
+    private final String[] elements;
     private int size;
 
+    /**
+     * Создаёт массив с ёмкостью по умолчанию — 100 элементов.
+     */
     public SortedStringArray() {
-        this.elements = new String[10]; // начальная ёмкость
-        this.size = 0;
+        this(100);
     }
 
-    public SortedStringArray(int initialCapacity) {
-        if (initialCapacity <= 0) {
+    /**
+     * Создаёт массив с заданной ёмкостью.
+     * Больше capacity элементов добавить не получится.
+     */
+    public SortedStringArray(int capacity) {
+        if (capacity <= 0) {
             throw new IllegalArgumentException("Capacity must be positive");
         }
-        this.elements = new String[initialCapacity];
+        this.elements = new String[capacity];
         this.size = 0;
     }
 
     /**
      * Добавляет строку, сохраняя массив отсортированным по возрастанию длины.
-     * При равенстве длин новый элемент вставляется после существующих.
+     * Если места нет — бросает IllegalStateException.
      */
     public void add(String value) {
         if (value == null) {
             throw new IllegalArgumentException("Value must not be null");
         }
-        ensureCapacity();
+        if (size == elements.length) {
+            throw new IllegalStateException("Array is full");
+        }
         int insertIndex = findInsertIndex(value.length());
-        // сдвигаем элементы вправо
         System.arraycopy(elements, insertIndex, elements, insertIndex + 1, size - insertIndex);
         elements[insertIndex] = value;
         size++;
@@ -39,14 +46,6 @@ public class SortedStringArray {
             i++;
         }
         return i;
-    }
-
-    private void ensureCapacity() {
-        if (size == elements.length) {
-            String[] newArr = new String[elements.length * 2];
-            System.arraycopy(elements, 0, newArr, 0, size);
-            elements = newArr;
-        }
     }
 
     /**
@@ -75,6 +74,10 @@ public class SortedStringArray {
 
     public int size() {
         return size;
+    }
+
+    public int capacity() {
+        return elements.length;
     }
 
     public String get(int index) {
